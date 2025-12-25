@@ -1,0 +1,245 @@
+{% doc %}
+  @prompt
+    Create a mobile account/login button with icon that appears in the header on the far right side (outside the hamburger menu). The button should show a user icon and allow customers to login or access their account details. It should only be visible on mobile devices and positioned to the right of other header elements.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-mobile-account-button-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+  }
+
+  .ai-mobile-account-button__link-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: {{ block.settings.button_size }}px;
+    height: {{ block.settings.button_size }}px;
+    background-color: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    border: {{ block.settings.border_thickness }}px solid {{ block.settings.border_color }};
+  }
+
+  .ai-mobile-account-button__link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.hover_background_color }};
+  }
+
+  .ai-mobile-account-button__icon-{{ ai_gen_id }} {
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    color: {{ block.settings.icon_color }};
+  }
+
+  .ai-mobile-account-button__link-{{ ai_gen_id }}:hover .ai-mobile-account-button__icon-{{ ai_gen_id }} {
+    color: {{ block.settings.hover_icon_color }};
+  }
+
+  @media screen and (min-width: 750px) {
+    {% if block.settings.hide_on_desktop %}
+      .ai-mobile-account-button-{{ ai_gen_id }} {
+        display: none;
+      }
+    {% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    {% if block.settings.hide_on_mobile %}
+      .ai-mobile-account-button-{{ ai_gen_id }} {
+        display: none;
+      }
+    {% endif %}
+  }
+{% endstyle %}
+
+<mobile-account-button-{{ ai_gen_id }} class="ai-mobile-account-button-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <a
+    href="{{ routes.account_url }}"
+    class="ai-mobile-account-button__link-{{ ai_gen_id }}"
+    aria-label="{% if customer %}My account{% else %}Login{% endif %}"
+  >
+    {% if block.settings.icon_style == 'outline' %}
+      <svg
+        class="ai-mobile-account-button__icon-{{ ai_gen_id }}"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    {% else %}
+      <svg
+        class="ai-mobile-account-button__icon-{{ ai_gen_id }}"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    {% endif %}
+  </a>
+</mobile-account-button-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class MobileAccountButton{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.link = this.querySelector('.ai-mobile-account-button__link-{{ ai_gen_id }}');
+        
+        if (this.link) {
+          this.link.addEventListener('click', this.handleClick.bind(this));
+        }
+      }
+
+      handleClick(event) {
+        const url = this.link.getAttribute('href');
+        if (url) {
+          window.location.href = url;
+        }
+      }
+
+      disconnectedCallback() {
+        if (this.link) {
+          this.link.removeEventListener('click', this.handleClick.bind(this));
+        }
+      }
+    }
+
+    customElements.define('mobile-account-button-{{ ai_gen_id }}', MobileAccountButton{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Mobile account button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_desktop",
+      "label": "Hide on desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide on mobile",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "min": 30,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Button size",
+      "default": 44
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#fcfcfc"
+    },
+    {
+      "type": "color",
+      "id": "hover_background_color",
+      "label": "Hover background color",
+      "default": "#e4f6ff"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_thickness",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border thickness",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#020912"
+    },
+    {
+      "type": "header",
+      "content": "Icon style"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icon style",
+      "options": [
+        {
+          "value": "outline",
+          "label": "Outline"
+        },
+        {
+          "value": "solid",
+          "label": "Solid"
+        }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#020912"
+    },
+    {
+      "type": "color",
+      "id": "hover_icon_color",
+      "label": "Hover icon color",
+      "default": "#020912"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mobile account button"
+    }
+  ]
+}
+{% endschema %}
